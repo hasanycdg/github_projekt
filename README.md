@@ -1,4 +1,4 @@
-# G1T1
+# Weather Application Project
 
 
 
@@ -40,43 +40,6 @@ Administratoren verwalten Benutzerkonten, weisen Rollen zu bzw entziehen den Pre
 - Implementierung eines Abonnementmodells für weitere Details.
 - Sicherstellung Wetterdaten durch die Integration von OpenWeatherMap.
 
-
-## Roadmap
-- [ ] Meilenstein 1,  Datum:08.01.2024
-    ### Backend-Fertigstellung:
-    #### Zielsetzung;
-  - Bis zum 8. Januar 2024 soll das Backend der Weather Web Application vollständig entwickelt und funktionsfähig sein. Dies umfasst die Implementierung aller erforderlichen Server-Logik, Datenpersistenz und API-Integrationen gemäß den definierten Anforderungen. Das Backend soll in der Lage sein, sämtliche Nutzerfunktionen, Rollenverwaltung, Abonnementabrechnung und Wetterdatenabrufe erfolgreich zu unterstützen.
-    #### Aufgaben; 
-    - [ ] Alle Backend-Funktionen wurden gemäß den Anforderungen implementiert und getestet 
-    - [ ]  Abonnementabrechnung und Premium-Statusverwaltung funktionieren reibungslos.
-    - [ ]  Alle Nutzerrollen können ihre jeweiligen Funktionen erfolgreich ausführen.
-
-
-
-
-- [ ] Meilenstein 2, Datum 15.01.2024
-  ### Frontend-Fertigstellung:
-  #### Zielsetzung;
-  - Bis zum 15. Januar 2024 soll die Integration des Frontends in die Weather Web Application abgeschlossen sein. Dies umfasst die Implementierung einer benutzerfreundlichen Benutzeroberfläche, die die oben genannten Ziele erfüllt.
-  #### Aufgaben;
-    - [ ] Entwurf und Implementierung der Benutzeroberfläche für alle definierten Nutzerrollen (USER, PREMIUM, MANAGER, ADMIN).
-    - [ ] Integration der Backend-Funktionalitäten in das Frontend.
-    - [ ] Sicherstellung der Browserkompatibilität für die gängigsten Browser.
-    - [ ] Testen der Frontend-Integration und Behebung von auftretenden Problemen.
-    - [ ] Testen des Backends.
-
-
-- [ ] Meilenstein 3, Datum 22.01.2024
-  ### Präsentationsvorbereitung:
-  #### Zielsetzung;
-    - Bis zum 22. Januar 2024 sollen alle Vorbereitungen für die Präsentation der g1t1 Weather Web Application abgeschlossen sein.
-  #### Aufgaben;
-    - [ ] Bis zum 22. Januar 2024 sollen alle Vorbereitungen für die Präsentation der Weather Web Application abgeschlossen sein.
-    - [ ] Vorbereitung von Demo-Szenarien, um live Funktionalitäten der Anwendung zu präsentieren.
-    - [ ] Klärung von potenziellen Fragen, die während der Präsentation gestellt werden könnten.
-
-## Dokumentation
-Für ein vertieftes Verständnis und detaillierte technische Einblicke in unser Java-Projekt, laden wir Sie ein, unsere ausführliche [Dokumentation](Organisation/dokumentation_projekt.pdf) zu lesen.
 
 ## Tests User
 |Nutzer		|Password		| Rolle		|
