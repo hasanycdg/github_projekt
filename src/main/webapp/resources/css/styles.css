@@ -1,0 +1,24 @@
+body .borderless .ui-panel .ui-panel-content{
+    border: none;
+}
+/* this rule removes the border of panels when inside a panelGrid with styleClass="borderless" */
+
+.thirty-percent{
+    width: 30%;
+}
+
+.seventy-percent{
+    width: 70%;
+}
+
+.twenty-percent{
+    height: 10px;
+}
+
+body .ui-datatable .ui-datatable-data>tr>td{
+    padding: 0 0.4rem;
+}
+
+body .ui-datatable thead th{
+    padding: 0;
+}

@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui" xmlns:o="http://omnifaces.org/ui"
+	template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <p:panel header="Favorite Locations" toggleable="true" collapsed="false">
+
+            <!-- filter input -->
+            <h:form id="filterForm">
+                <p:inputText id="filterInput" value="#{filterListBean.filterLocation}" placeholder="Filter by name">
+                    <p:ajax update="FavLocationForm" />
+                </p:inputText>
+            </h:form>
+
+            <!-- configure shown data -->
+            <h:form id="configureForm">
+                <p:commandButton update=":FavLocationForm" oncomplete="PF('configureColumnDialog').show()" icon="pi pi-cog">
+                        <f:setPropertyActionListener value="#{favLocation}" target="#{configureFavListBean.favLocation}"/>
+                </p:commandButton>
+
+                <p:dialog header="Configure shown data" id="configureColumnDialog" widgetVar="configureColumnDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                    <p:outputPanel id="configureData" >
+                        <h:panelGrid columns="2">
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentSunrise}" itemLabel="Sunrise Time" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentSunset}" itemLabel="Sunset Time" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentTemp}" itemLabel="Temperature" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentFeelsLike}" itemLabel="Feels Like" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentHumidity}" itemLabel="Humidity" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentDewPoint}" itemLabel="Dew Point" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentPressure}" itemLabel="Pressure" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentClouds}" itemLabel="Clouds" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentUvi}" itemLabel="UV Index" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentVisibility}" itemLabel="Visibility" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentWindSpeed}" itemLabel="Wind Speed" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentWindDeg}" itemLabel="Wind Degree" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentRain}" itemLabel="Rain Volume" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showCurrentSnow}" itemLabel="Snow Volume" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showWeatherIcon}" itemLabel="Weather Icon" />
+                            <p:selectBooleanCheckbox value="#{configureFavListBean.showWeatherMain}" itemLabel="Weather Description" />
+
+                        </h:panelGrid>
+                        <p:separator />
+                        <h:panelGrid columns="3">
+                            <p:commandButton value="Close" onclick="PF('userEditDialog').hide()"/>
+                        </h:panelGrid>
+                    </p:outputPanel>
+                </p:dialog>
+            </h:form>
+
+            <!-- favoritenListe -->
+
+        </p:panel>
+        <h:form id="FavLocationForm">
+            <p:growl id="msgs" showDetail="true" skipDetailIfEqualsSummary="true" />
+            <p:orderList value="#{reorderOrderlistBean.filteredFavLocations}" var="favLocation" itemValue="#{favLocation}" converter="#{favLocationConverter}" controlsLocation="left" responsive="true">
+                <p:ajax event="select" listener="#{reorderOrderlistBean.onSelect}" update="msgs"/>
+                <p:ajax event="reorder" listener="#{reorderOrderlistBean.onReorder}" update="msgs"/>
+                <!-- Favoriten Name -->
+                <p:column style="width:40px">
+                    <h:outputText value="#{favLocation.name}" />
+                </p:column>
+
+                <!-- Favoriten Current Wetter Daten -->
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentSunrise}">
+                    <h:outputText value="#{configureFavListBean.getCurrentSunriseTime(favLocation)}" rendered="#{configureFavListBean.showCurrentSunrise}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentSunset}">
+                    <h:outputText value="#{configureFavListBean.getCurrentSunsetTime(favLocation)}" rendered="#{configureFavListBean.showCurrentSunset}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentTemp}">
+                    <h:outputText value="#{configureFavListBean.getCurrentTemperature(favLocation)}" rendered="#{configureFavListBean.showCurrentTemp}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentFeelsLike}">
+                    <h:outputText value="#{configureFavListBean.getFeelsLikeTemp(favLocation)}" rendered="#{configureFavListBean.showCurrentFeelsLike}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentHumidity}">
+                    <h:outputText value="#{configureFavListBean.getCurrentHumidity(favLocation)}" rendered="#{configureFavListBean.showCurrentHumidity}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentDewPoint}">
+                    <h:outputText value="#{configureFavListBean.getCurrentDewPoint(favLocation)}" rendered="#{configureFavListBean.showCurrentDewPoint}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentPressure}">
+                    <h:outputText value="#{configureFavListBean.getCurrentPressure(favLocation)}" rendered="#{configureFavListBean.showCurrentPressure}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentClouds}">
+                    <h:outputText value="#{configureFavListBean.getCurrentClouds(favLocation)}" rendered="#{configureFavListBean.showCurrentClouds}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentUvi}">
+                    <h:outputText value="#{configureFavListBean.getCurrentUvi(favLocation)}" rendered="#{configureFavListBean.showCurrentUvi}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentVisibility}">
+                    <h:outputText value="#{configureFavListBean.getCurrentVisibility(favLocation)}" rendered="#{configureFavListBean.showCurrentVisibility}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentWindSpeed}">
+                    <h:outputText value="#{configureFavListBean.getCurrentWindSpeed(favLocation)}" rendered="#{configureFavListBean.showCurrentWindSpeed}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentWindDeg}">
+                    <h:outputText value="#{configureFavListBean.getCurrentWindDeg(favLocation)}" rendered="#{configureFavListBean.showCurrentWindDeg}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentRain}">
+                    <h:outputText value="#{configureFavListBean.getCurrentRainVolume(favLocation)}" rendered="#{configureFavListBean.showCurrentRain}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showCurrentSnow}">
+                    <h:outputText value="#{configureFavListBean.getCurrentSnowVolume(favLocation)}" rendered="#{configureFavListBean.showCurrentSnow}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showWeatherIcon}">
+                    <p:graphicImage value="#{foreCastBean.getImageUrl(configureFavListBean.getCurrentWeather(favLocation).weather().icon())}" rendered="#{configureFavListBean.showWeatherIcon}" />
+                </p:column>
+                <p:column style="width: 30px" rendered="#{configureFavListBean.showWeatherMain}">
+                    <h:outputText value="#{configureFavListBean.getCurrentWeather(favLocation).weather().description()}" rendered="#{configureFavListBean.showWeatherMain}" />
+                </p:column>
+
+                <!-- Option Favoriten von der Home Seite zu entfernen -->
+                <p:column style="width:20px">
+                    <p:commandButton value="Delete" action="#{reorderOrderlistBean.deleteLocation()}"
+                                     update="FavLocationForm">
+                        <f:param name="idFavLocation" value="#{favLocation.id}" />
+                    </p:commandButton>
+                </p:column>
+            </p:orderList>
+        </h:form>
+    </ui:define>
+</ui:composition>

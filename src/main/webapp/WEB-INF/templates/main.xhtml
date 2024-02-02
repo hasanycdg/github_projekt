@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets" xml:lang="en">
+
+<h:head>
+    <title>Weather Application</title>
+
+    <!-- include global script for changing primefaces charts    -->
+    <h:outputScript library="js" name="extender.js" />
+
+</h:head>
+
+<h:body style="margin: 0;">
+
+    <!-- include global css    -->
+    <h:outputStylesheet name="css/styles.css"/>
+
+    <!-- include script to enable point labels in primefaces charts, this plugin is used in externder.js   -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0" integrity="sha384-M00GJNq2IplZCB3+JOJEl2H0un45ODvqJSSnIc4DvG8gPn8RX5ToITFXcv3AvOx5" crossorigin="anonymous"></script>
+
+    <div id="page">
+        <div id="header">
+            <ui:include src="/WEB-INF/includes/header.xhtml" />
+        </div>
+
+        <div id="content">
+            <ui:insert name="content">Content</ui:insert>
+        </div>
+
+        <div id="footer">
+            <ui:include src="/WEB-INF/includes/footer.xhtml" />
+        </div>
+
+    </div>
+
+</h:body>
+
+</html>

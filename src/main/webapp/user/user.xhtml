@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <h:form id="oneUserForm">
+            <p:dataTable id="userInformation" var="user" value="#{userDetailController.doLoadUser(sessionInfoBean.currentUser.username)}">
+                <p:column headerText="Username">
+                    <h:outputText value="#{user.username}"/>
+                </p:column>
+                <p:column headerText="First Name">
+                    <h:outputText value="#{user.firstName}"/>
+                </p:column>
+                <p:column headerText="Last Name">
+                    <h:outputText value="#{user.lastName}"/>
+                </p:column>
+                <p:column headerText="Email">
+                    <h:outputText value="#{user.email}"/>
+                </p:column>
+                <p:column headerText="Bank Information">
+                    <h:outputText value="#{user.creditCard.number}"/>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":oneUserForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="pi pi-cog" title="Edit My information">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":oneUserForm:passwordEditDialog" oncomplete="PF('passwordEditDialog').show()" icon="pi pi-key" title="Edit Password">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":oneUserForm:creditCardDialog" oncomplete="PF('creditCardDialog').show()" icon="pi pi-star" title="Go Premium">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":oneUserForm:deleteAccountDialog" oncomplete="PF('deleteAccountDialog').show()" icon="pi pi-trash" title="Delete Account">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog header="#{sessionInfoBean.currentUser.username}" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}" >
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="firstName" value="First Name: " />
+                        <p:inputText id="firstName" value="#{userDetailController.user.firstName}"/>
+                        <p:outputLabel for="lastName" value="Last Name: " />
+                        <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
+                        <p:outputLabel for="email" value="E-Mail: " />
+                        <p:inputText id="email" value="#{userDetailController.user.email}"/>
+
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide();"  update=":oneUserForm:userInformation"/>
+                        <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:dialog header="Edit Password" id="passwordEditDialog" widgetVar="passwordEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="PasswordData" rendered="#{not empty userDetailController.user}" >
+                <h:panelGrid columns="3">
+                    <p:outputLabel for="password" value="Password:" />
+                    <p:inputText id="password" type="password" value="#{userDetailController.user.password}" required="true"
+                                 validatorMessage="Please enter a Password of at least length 8!"
+                                 requiredMessage="Please enter a Password!"
+                                 placeholder="Enter a new Password"
+                                 onfocus="if (this.value != '') { this.value = null; }">
+                        <f:validateLength minimum="8" />
+                        <p:ajax event="keyup"  update="validationMessage" />
+                    </p:inputText>
+                    <p:message  id="validationMessage" for="password" />
+                </h:panelGrid>
+
+                <h:panelGrid columns="3">
+                    <p:outputLabel for="confirmPassword" value="Confirm Password:" />
+                    <p:inputText id="confirmPassword" type="password" value="#{userDetailController.confirmPassword}" required="true"
+                                 validatorMessage="The Passwords do not match!"
+                                 requiredMessage="Please enter a Password!"
+                                placeholder="confirm password"
+                                 onfocus="if (this.value != '') { this.value = null; }">
+                        <p:ajax event="keyup" listener="#{userDetailController.checkPasswords}" update="passwordMessage" />
+                    </p:inputText>
+                    <p:message  id="passwordMessage" for="confirmPassword" />
+                </h:panelGrid>
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('passwordEditDialog').hide();"  update=":oneUserForm:userInformation"/>
+                        <p:commandButton value="Abort" onclick="PF('passwordEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:dialog header="Delete Account?" id="deleteAccountDialog" widgetVar="deleteAccountDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="deleteAccount" rendered="#{not empty userDetailController.user}">
+                        <p:commandButton value="Yes" action="#{userDetailController.doDeleteUser}" oncomplete="/logout;"  update=":oneUserForm:userInformation"/>
+                        <p:commandButton value="No" onclick="PF('deleteAccountDialog').hide()"/>
+                </p:outputPanel>
+            </p:dialog>
+
+
+            <p:dialog header="Credit Card Details" id="creditCardDialog" widgetVar="creditCardDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="creditCardData" rendered="#{not empty userDetailController.user}">
+                <h:panelGrid columns="3" >
+
+                    <p:outputLabel for="number" value="CreditCard number: " />
+                    <p:inputText id="number" value="#{creditCardController.newCreditCard.number}"
+                        placeholder="#{userDetailController.user.creditCard != null ? userDetailController.user.creditCard.number : '****-****-****-****'}"
+                        required= "true"
+                        validatorMessage="Form : xxxx-xxxx-xxxx-xxxx"
+                        requiredMessage="Please enter a valid CreditCard number!">
+                        <f:validateRegex pattern="\d{4}-\d{4}-\d{4}-\d{4}" />
+                        <p:ajax event="keyup" update="numberMessage" />
+                    </p:inputText>
+                    <p:message id="numberMessage" for="number" />
+                    <p:outputLabel for="cvc" value="CVC: " />
+                    <p:inputText id="cvc" value="#{creditCardController.newCreditCard.cvc}" required="true"
+                        placeholder="***"
+                        validatorMessage="Form : xxx"
+                         requiredMessage="Please enter a valid CVC number!">
+                        <f:validateRegex pattern="\d{3}" />
+                        <p:ajax event="keyup" update="cvcMessage" />
+                    </p:inputText>
+                    <p:message id="cvcMessage" for="cvc"/>
+                    <p:outputLabel for="name" value="Cardholder: " />
+                    <p:inputText id="name" value="#{creditCardController.newCreditCard.name}"
+                                 placeholder="#{userDetailController.user.creditCard != null ? userDetailController.user.creditCard.name : 'Max Mustermann'}"
+                                 required="true"
+                                 validatorMessage="Form: x"
+                                 requiredMessage="Please enter a Cardholders Name!">
+                    <p:ajax event="keyup" update="nameMessage" />
+                    </p:inputText>
+                    <p:message id="nameMessage" for="name" />
+
+                    <p:outputLabel for="expirationDate" value="Expiration Date: " />
+                    <p:inputText id="expirationDate" value="#{creditCardController.newCreditCard.expirationDate}"
+                                 placeholder="#{userDetailController.user.creditCard != null ? userDetailController.user.creditCard.expirationDate : 'MM/YYYY'}"
+                                 required="true"
+                                 validatorMessage="Form : xx/xxxx"
+                                 requiredMessage="Please enter a valid ExpirationDate!">
+                        <f:validateRegex pattern="(0[1-9]|1[0-2])\/\d{4}" />
+                        <p:ajax event="keyup" update="dateMessage" />
+                    </p:inputText>
+                    <p:message id="dateMessage" for="expirationDate" />
+                    <h:panelGrid columns="3">
+                    <p:commandButton value="Save" action="#{creditCardController.doSaveCreditCard}"
+                                     oncomplete="if(#{not empty userDetailController.user.creditCard}) PF('creditCardDialog').hide(); else PF('creditCardDialog').show()"
+                                     update="creditCardDialog :oneUserForm:userInformation">
+                    </p:commandButton>
+                    <p:commandButton value="#{userDetailController.user.premium ? 'Cancel Subscription' : 'Go Premium'}"
+                                     action="#{userDetailController.togglePremium}"
+                                     oncomplete="PF('creditCardDialog').hide();" update=":oneUserForm:userInformation"
+                                     rendered="#{not empty userDetailController.user.creditCard}" immediate="true"/>
+                    <p:commandButton value="Abort" onclick="PF('creditCardDialog').hide()" />
+                </h:panelGrid>
+                </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,66 @@
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <h:form id="register_form">
+            <h:panelGrid columns="2">
+                <p:outputLabel for="firstName" value="Firstname"/>
+                <p:inputText id="firstName" value="#{userDetailController.newUser.firstName}" required="false"/>
+
+                <p:outputLabel for="lastName" value="Lastname:"/>
+                <p:inputText id="lastName" value="#{userDetailController.newUser.lastName}" required="false"/>
+            </h:panelGrid>
+
+            <h:panelGrid columns="3">
+                <p:outputLabel for="username" value="Username:"/>
+                <p:inputText id="username" value="#{userDetailController.newUser.username}" required="true"
+                             requiredMessage="Please enter a Username!">
+                    <p:ajax event="keyup" listener="#{userDetailController.checkUsernameAvailability}"
+                            update="usernameMessage"/>
+                </p:inputText>
+                <p:message id="usernameMessage" for="username"/>
+
+
+                <p:outputLabel for="email" value="Email:"/>
+                <p:inputText id="email" value="#{userDetailController.newUser.email}" required="true"
+                             validatorMessage="Invalid email format."
+                             requiredMessage="Please provide a valid Email!">
+                    <f:validateRegex pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]+$"/>
+                    <p:ajax event="keyup" update="emailMessage"/>
+                </p:inputText>
+                <p:message id="emailMessage" for="email"/>
+
+
+                <p:outputLabel for="password" value="Password:"/>
+                <p:inputText id="password" type="password" value="#{userDetailController.newUser.password}"
+                             required="true"
+                             validatorMessage="Please enter a Password of at least length 8!"
+                             requiredMessage="Please enter a Password!">
+                    <f:validateLength minimum="8"/>
+                    <p:ajax event="keyup" update="validationMessage"/>
+                </p:inputText>
+                <p:message id="validationMessage" for="password"/>
+
+
+                <p:outputLabel for="confirmPassword" value="Confirm Password:"/>
+                <p:inputText id="confirmPassword" type="password" value="#{userDetailController.confirmPassword}"
+                             required="true"
+                             validatorMessage="The Passwords do not match!"
+                             requiredMessage="Please enter a Password!"
+                             onfocus="if (this.value != '') { this.value = null; }">
+                    <p:ajax event="keyup" listener="#{userDetailController.checkPasswords}" update="passwordMessage"/>
+                </p:inputText>
+                <p:message id="passwordMessage" for="confirmPassword"/>
+            </h:panelGrid>
+
+            <p:commandButton value="Register" action="#{userDetailController.doRegisterUser()}"
+                             styleClass="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"/>
+            <p:commandLink value="   Already Registered?" onclick="window.location.href='login.xhtml'"/>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

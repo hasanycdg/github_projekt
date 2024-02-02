@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <h:form id="select_form">
+            <h:panelGrid columns="2">
+                <h:outputText value="Choose a Year:"/>
+                <h:selectOneMenu value="#{dateSelectionBean.selectedYear}">
+                    <f:selectItems value="#{dateSelectionBean.years}" var="year"
+                                   itemLabel="#{year}" itemValue="#{year}"/>
+                </h:selectOneMenu>
+
+                <h:outputText value="Choose a Month:"/>
+                <h:selectOneMenu value="#{dateSelectionBean.selectedMonth}">
+                    <f:selectItems value="#{dateSelectionBean.months}" var="month"
+                                   itemLabel="#{month}" itemValue="#{month}"/>
+                </h:selectOneMenu>
+
+                <h:commandButton value="Display" action="#{dateSelectionBean.printDates}"  icon="pi-arrow-circle-right"/>
+            </h:panelGrid>
+        </h:form>
+    </ui:define>
+</ui:composition>

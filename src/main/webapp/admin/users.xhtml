@@ -1,0 +1,173 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <!-- filter input -->
+        <h:form id="filterForm">
+            <p:inputText id="filterInput" value="#{filterListBean.filterUser}" placeholder="Enter keyword">
+                <p:ajax update="oneUserForm" />
+            </p:inputText>
+        </h:form>
+
+        <h:form id="oneUserForm">
+            <p:dataTable id="userInformation" var="user" value="#{reorderDataListBean.userList}" allowUnsorting="true" sortMode="single">
+
+
+                <p:column headerText="Username" sortBy="#{user.username}">
+                    <h:outputText value="#{user.username}"/>
+                </p:column>
+                <p:column headerText="First Name" sortBy="#{user.firstName}">
+                    <h:outputText value="#{user.firstName}"/>
+                </p:column>
+                <p:column headerText="Last Name" sortBy="#{user.lastName}">
+                    <h:outputText value="#{user.lastName}"/>
+                </p:column>
+                <p:column headerText="Email" sortBy="#{user.email}">
+                    <h:outputText value="#{user.email}"/>
+                </p:column>
+                <p:column headerText="Edit User" style="width:150px;text-align: center">
+                    <p:commandButton update=":oneUserForm:userEditDialog" oncomplete="PF('userEditDialog').show()"
+                                     icon="pi pi-cog" title="Edit user information">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="Edit Password" style="width:150px;text-align: center">
+                    <p:commandButton update=":oneUserForm:passwordEditDialog"
+                                     oncomplete="PF('passwordEditDialog').show()" icon="pi pi-key"
+                                     title="Edit Password">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":oneUserForm:resetPasswordDialog"
+                                     oncomplete="PF('resetPasswordDialog').show()"
+                                     icon="pi pi-envelope" title="Reset Password">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog header=" User: #{userDetailController.user.username}" id="userEditDialog"
+                      widgetVar="userEditDialog"
+                      modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="firstName" value="First Name: "/>
+                        <p:inputText id="firstName" value="#{userDetailController.user.firstName}"/>
+                        <p:outputLabel for="lastName" value="Last Name: "/>
+                        <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
+                        <p:outputLabel for="Role" value="Roles: "/>
+                        <p:selectManyCheckbox id="Role" value="#{userDetailController.selectedRoles}">
+                            <f:selectItems value="#{userDetailController.allRoles}"/>
+                        </p:selectManyCheckbox>
+                        <p:outputLabel for="email" value="E-Mail: "/>
+                        <p:inputText id="email" value="#{userDetailController.user.email}"/>
+                        <p:outputLabel for="bankaccountnumber" value="Bank Account Number: "
+                                       rendered="#{userDetailController.user.creditCard.number ne null}"/>
+                        <p:inputText id="bankaccountnumber" value="#{userDetailController.user.creditCard.number}"
+                                     rendered="#{userDetailController.user.creditCard.number ne null}"/>
+                    </h:panelGrid>
+                    <p:separator/>
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{userDetailController.saveUserPlusSaveRoles()}"
+                                         oncomplete="PF('userEditDialog').hide();"
+                                         update=":oneUserForm:userInformation, :oneUserForm:userInformationRolLog"/>
+                        <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
+                        <p:commandButton value="Delete User" action="#{userDetailController.doDeleteUser()}"
+                                         oncomplete="PF('userEditDialog').hide();"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:dialog header="Edit Password" id="passwordEditDialog" widgetVar="passwordEditDialog" modal="true"
+                      showEffect="fade" hideEffect="fade" resizable="false">
+
+                <p:outputPanel id="passwordData" rendered="#{not empty userDetailController.user}">
+                    <h:panelGrid columns="3">
+                        <p:outputLabel for="password" value="Password:"/>
+                        <p:inputText id="password" type="password" value="#{userDetailController.user.password}"
+                                     required="true"
+                                     validatorMessage="Please enter a Password of at least length 8!"
+                                     requiredMessage="Please enter a Password!"
+                                     placeholder="Please enter a Password"
+                                     onfocus="if (this.value != '') { this.value = null; }">
+                            <f:validateLength minimum="8"/>
+                            <p:ajax event="keyup" update="validationMessage"/>
+                        </p:inputText>
+
+                        <p:message id="validationMessage" for="password"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="3">
+                        <p:outputLabel for="confirmPassword" value="Confirm Password:"/>
+                        <p:inputText id="confirmPassword" type="password"
+                                     value="#{userDetailController.confirmPassword}" required="true"
+                                     validatorMessage="The Passwords do not match!"
+                                     requiredMessage="Please enter a Password!"
+                                     placeholder="confirm password"
+                                     onfocus="if (this.value != '') { this.value = null; }">
+                            <p:ajax event="keyup" listener="#{userDetailController.checkPasswords}"
+                                    update="passwordMessage"/>
+                        </p:inputText>
+                        <p:message id="passwordMessage" for="confirmPassword"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}"
+                                         oncomplete="PF('passwordEditDialog').hide();"
+                                         update=":oneUserForm:userInformation"/>
+                        <p:commandButton value="Abort" onclick="PF('passwordEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:dialog header="Reset Password" id="resetPasswordDialog" widgetVar="resetPasswordDialog" modal="true"
+                      showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="resetPassword" rendered="#{not empty userDetailController.user}">
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="Save" action="#{userDetailController.resetPasswordEmail()}"
+                                         oncomplete="PF('resetPasswordDialog').hide();"
+                                         update=":oneUserForm:userInformation"/>
+                        <p:commandButton value="Abort" onclick="PF('resetPasswordDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+            </p:confirmDialog>
+
+            <p:button value="Register a new User" outcome="/register_page.xhtml"
+                      rendered="#{sessionInfoBean.loggedIn}"/>
+
+            <div style="margin-bottom: 10px; text-align: center;">
+                <h3 style="background-color: #f2f2f2; padding: 10px; border-radius: 5px;">Roles Changed</h3>
+            </div>
+            <p:dataTable id="userInformationRolLog" var="id" value="#{userListController.idInRoleChaneLog}"
+                         styleClass="myDataTable">
+                <p:column headerText="User">
+                    <h:outputText value="#{userListController.getByIdInRoleChaneLog(id).user.username}"/>
+                </p:column>
+                <p:column headerText="New Roles">
+                    <h:outputText value="#{userListController.getByIdInRoleChaneLog(id).newRoles}"/>
+                </p:column>
+                <p:column headerText="Old Roles">
+                    <h:outputText value="#{userListController.getByIdInRoleChaneLog(id).oldRoles}"/>
+                </p:column>
+                <p:column headerText="Time of change">
+                    <h:outputText value="#{userListController.getByIdInRoleChaneLog(id).chanegeTime}">
+                        <f:convertDateTime type="localDate" pattern="yyyy-MM-dd MM:ss" />
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+
+        </h:form>
+    </ui:define>
+</ui:composition>
+

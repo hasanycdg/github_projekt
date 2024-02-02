@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <!-- filter input -->
+        <h:form id="filterForm">
+            <p:inputText id="filterInput" value="#{filterListBean.filterUser}" placeholder="Enter keyword">
+                <p:ajax update="userListForm" />
+            </p:inputText>
+        </h:form>
+
+        <h:form id="userListForm">
+            <h:outputText value="Selected Year: #{dateSelectionBean.selectedYear}" />
+            <br/>
+            <h:outputText value="Selected Month: #{dateSelectionBean.selectedMonth}" />
+            <p:separator />
+
+            <p:dataTable id="usersTable" var="paymentHistory" value="#{reorderDataListBean.paymentHistoryList}" allowUnsorting="true" sortMode="single">
+                <p:column headerText="Username" sortBy="#{paymentHistory.user.username}">
+                    <h:outputText value="#{paymentHistory.user.username}"/>
+                </p:column>
+                <p:column headerText="Payment Status" sortBy="#{paymentHistory.paymentStatus}}">
+                    <h:outputText value="#{paymentHistory.paymentStatus}"/>
+                </p:column>
+                <p:column headerText="Days Till end Month">
+                </p:column>
+                <p:column headerText="Charged Days" sortBy="#{paymentHistory.chargedDays}">
+                    <h:outputText value="#{paymentHistory.chargedDays}" rendered="#{paymentHistory.chargedDays ne 0}"/>
+                </p:column>
+                <p:column headerText="Cash up" style="width:100px;text-align: center">
+                    <p:commandButton action="#{premiumStatusListener.cashUpTillEndCurrentMonth(paymentHistory.user)}" update=":userListForm:usersTable" icon="pi pi-euro" title="Cash-up"
+                                     rendered="#{dateSelectionBean.isSelectedDateCurrent() and paymentHistory.paymentStatus eq 'OPEN'}">
+                        <p:confirm header="Confirmation" message="Are you sure to cash up the user?" icon="ui-icon-alert" />
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="User Details" style="width:100px;text-align: center">
+                    <p:commandButton update=":userListForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="pi pi-info-circle" title="Details">
+                        <f:setPropertyActionListener value="#{paymentHistory.user}" target="#{userDetailController.user}" />
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog header="User Details" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
+
+                    <h:outputText value="Registered Date: " />
+                    <h:outputText value="#{userDetailController.user.createDate}">
+                        <f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
+                    </h:outputText>
+                    <br />
+                    <h:outputText value="Total Time as Premium User: " />
+                    <h:outputText value="#{premiumStatusListener.getTotalPremiumTimeByName(userDetailController.user)}" />
+                    <h:outputText value=" seconds" />
+
+                    <p:separator />
+
+                    <p:dataTable id="PremiumChanged" var="premiumHistory" value="#{premiumStatusListener.getPremiumIntervalByName(userDetailController.user)}" rowIndexVar="rowIndex">
+                            <!--filterDatesByMonthAndYear(userDetailController.user,dateSelectionBean.selectedYear, dateSelectionBean.selectedMonth)}"
+                            changed the value to this so only the changes in the certain month and year is displayed. -->
+                        <p:column headerText="Change Date">
+                            <h:outputText value="#{premiumHistory.changeDate}">
+                                <f:convertDateTime type="localDate" pattern="yyyy-MM-dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="New Premium Status">
+                            <h:outputText value="#{premiumHistory.newPremiumStatus ? 'Premium' : 'Not Premium'}" />
+                        </p:column>
+                        <p:column headerText="Was Premium for">
+                            <h:outputText value="#{premiumStatusListener.getTimePremiumInterval(premiumStatusListener.getPremiumIntervalByName(userDetailController.user)).get(rowIndex / 2)}" rendered="#{rowIndex % 2 == 1}" />
+                            <h:outputText value=" seconds" rendered="#{rowIndex % 2 == 1}" />
+                        </p:column>
+                    </p:dataTable>
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="enabled" value="Premium: " />
+                        <p:selectBooleanCheckbox id="enabled" value="#{userDetailController.user.premium}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="3">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userListForm:usersTable"/>
+                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userListForm:userData"/>
+                        <p:commandButton value="Abort" onclick="PF('userEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
